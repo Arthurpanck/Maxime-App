@@ -4,8 +4,17 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- Guillemets stylisés, noir sur fond blanc, centrés dans la zone sûre -->
-    <group android:scaleX="1.6" android:scaleY="1.6" android:pivotX="54" android:pivotY="54">
+    <!-- Guillemets noirs sur fond blanc.
+         Le dessin s'étend en x de 28 à 73 (centre 50.5) et en y de 40 à 71
+         (centre 55.5). On met l'échelle autour de ce centre réel, puis on
+         translate pour amener ce centre au milieu de l'icône (54, 54). -->
+    <group
+        android:pivotX="50.5"
+        android:pivotY="55.5"
+        android:scaleX="1.35"
+        android:scaleY="1.35"
+        android:translateX="3.5"
+        android:translateY="-1.5">
         <path
             android:fillColor="#111111"
             android:pathData="M38,40 C32,40 28,44 28,50 C28,56 32,60 38,60 C39,60 40,60 41,59 C40,63 37,66 33,67 L34,71 C42,69 47,62 47,53 L47,50 C47,44 43,40 38,40 Z" />
