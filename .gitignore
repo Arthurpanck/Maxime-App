@@ -9,3 +9,6 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# APK livré à la main (artefact de build, à ne pas versionner)
+*.apk
