@@ -82,36 +82,11 @@ class MaximeStore private constructor(context: Context) {
         get() = prefs.getBoolean(CLE_AUTO_ACTIF, true)
         set(value) = prefs.edit().putBoolean(CLE_AUTO_ACTIF, value).apply()
 
-    /** Dernière date (format AAAAMMJJ) à laquelle la maxime du matin a été montrée. */
-    private var derniereDateAffichee: Int
-        get() = prefs.getInt(CLE_DERNIERE_DATE, 0)
-        set(value) = prefs.edit().putInt(CLE_DERNIERE_DATE, value).apply()
-
-    /**
-     * Détermine s'il faut afficher la maxime maintenant, en fonction de
-     * l'heure courante et de la dernière date d'affichage.
-     *
-     * @param dateDuJour date au format AAAAMMJJ
-     * @param minutesDepuisMinuit heure courante exprimée en minutes depuis minuit
-     */
-    fun doitAfficher(dateDuJour: Int, minutesDepuisMinuit: Int): Boolean {
-        if (!affichageAutoActif) return false
-        if (derniereDateAffichee == dateDuJour) return false
-        val seuil = heureDeclenchement * 60 + minuteDeclenchement
-        return minutesDepuisMinuit >= seuil
-    }
-
-    /** À appeler une fois la maxime du matin affichée. */
-    fun marquerAffichee(dateDuJour: Int) {
-        derniereDateAffichee = dateDuJour
-    }
-
     companion object {
         private const val CLE_MAXIMES = "maximes_json"
         private const val CLE_HEURE = "heure_declenchement"
         private const val CLE_MINUTE = "minute_declenchement"
         private const val CLE_AUTO_ACTIF = "affichage_auto_actif"
-        private const val CLE_DERNIERE_DATE = "derniere_date_affichee"
 
         @Volatile
         private var instance: MaximeStore? = null

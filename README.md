@@ -10,10 +10,11 @@ Interface volontairement **blanche et épurée**, texte noir.
   le téléphone).
 - **Réglage de l'heure** : tu choisis l'heure à partir de laquelle la maxime du
   jour peut s'afficher (par défaut 7h00).
-- **Affichage du matin** : le premier déverrouillage de l'écran après cette
-  heure ouvre une maxime au hasard en plein écran. Une seule fois par jour.
-  Un appui sur l'écran la referme.
-- **Activation / désactivation** de l'affichage automatique dans les réglages.
+- **Maxime du matin** : à l'heure choisie, une **notification** « Ta maxime du
+  matin » est déposée. Au déverrouillage suivant, tu la vois et tu la tapes pour
+  ouvrir la maxime du jour en plein écran (fond blanc, texte noir). Un appui sur
+  l'écran la referme.
+- **Activation / désactivation** de la maxime du matin dans les réglages.
 
 ## Installer l'application
 
@@ -23,21 +24,18 @@ Interface volontairement **blanche et épurée**, texte noir.
 3. Ouvre-le ; autorise « installer des applications inconnues » si Android le
    demande.
 
-## Permissions à accorder (important)
+## Permissions
 
-Pour que la maxime puisse s'ouvrir **toute seule** au déverrouillage, ouvre les
-**Réglages** dans l'application et accorde :
+L'application est volontairement **sobre en permissions** :
 
-- **Afficher par-dessus les autres applications** (obligatoire pour l'ouverture
-  automatique).
-- **Désactiver l'optimisation de la batterie** pour Maxime (évite que le système
-  coupe le service d'écoute).
-- **Notifications** (Android 13+) : l'app garde une notification discrète et
-  permanente, nécessaire au service qui détecte le déverrouillage.
+- **Notifications** (`POST_NOTIFICATIONS`, Android 13+) : pour déposer la maxime
+  du matin. L'app te la demande au premier enregistrement des réglages.
+- **Démarrage** (`RECEIVE_BOOT_COMPLETED`, accordée automatiquement) : pour
+  reprogrammer l'alarme du matin après un redémarrage du téléphone.
 
-Sans ces autorisations, l'application fonctionne toujours, mais la maxime ne
-s'ouvrira pas automatiquement le matin (tu pourras la consulter en ouvrant
-l'app).
+Pas de service permanent, pas d'« afficher par-dessus les autres applis », pas
+d'exemption de batterie. Si tu refuses les notifications, l'app marche toujours :
+tu consultes simplement tes maximes en l'ouvrant.
 
 ## Construire l'APK
 
@@ -59,7 +57,9 @@ via `sdk.dir=/chemin/vers/android-sdk`).
 
 - Kotlin + Jetpack Compose, `minSdk 26`, `targetSdk 33`.
 - Données stockées en JSON dans les `SharedPreferences` (kotlinx.serialization).
-- `UnlockService` : service en avant-plan qui écoute `ACTION_USER_PRESENT`
-  (déverrouillage) et décide d'afficher ou non la maxime du jour.
-- `BootReceiver` : relance le service après un redémarrage ou une mise à jour.
-- `DisplayActivity` : l'écran plein écran, blanc, qui montre la maxime.
+- `MaximeScheduler` : programme une **alarme inexacte** quotidienne via
+  `AlarmManager` (aucune permission spéciale), reprogrammée chaque jour.
+- `AlarmReceiver` : à l'heure dite, dépose la notification de la maxime du matin.
+- `BootReceiver` : reprogramme l'alarme après un redémarrage ou une mise à jour.
+- `DisplayActivity` : l'écran plein écran, blanc, qui montre la maxime (ouvert
+  d'un tap sur la notification, ou depuis la liste).

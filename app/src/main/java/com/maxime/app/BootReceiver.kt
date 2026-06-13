@@ -5,17 +5,15 @@ import android.content.Context
 import android.content.Intent
 
 /**
- * Relance le service d'écoute après le redémarrage du téléphone (ou après une
- * mise à jour de l'application), afin que la maxime du matin continue de
- * s'afficher sans avoir à rouvrir l'app manuellement.
+ * Reprogramme l'alarme du matin après un redémarrage du téléphone (les alarmes
+ * `AlarmManager` ne survivent pas au reboot) ou après une mise à jour de l'app.
  */
 class BootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         when (intent.action) {
             Intent.ACTION_BOOT_COMPLETED,
-            Intent.ACTION_LOCKED_BOOT_COMPLETED,
             Intent.ACTION_MY_PACKAGE_REPLACED -> {
-                UnlockService.demarrer(context)
+                MaximeScheduler.programmer(context)
             }
         }
     }

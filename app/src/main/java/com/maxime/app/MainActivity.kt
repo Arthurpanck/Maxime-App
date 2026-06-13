@@ -72,8 +72,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         store = MaximeStore.get(this)
 
-        // Assure que le service d'écoute tourne.
-        UnlockService.demarrer(this)
+        // S'assure que l'alarme du matin est programmée.
+        MaximeScheduler.programmer(this)
 
         setContent {
             MaximeTheme {
@@ -268,23 +268,20 @@ private fun DialogReglages(store: MaximeStore, onFermer: () -> Unit) {
         is24Hour = true
     )
 
-    // Recalcul à chaque ouverture : la permission d'affichage est-elle accordée ?
-    var overlayOk by remember {
-        mutableStateOf(Settings.canDrawOverlays(context))
-    }
-    val overlayLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { overlayOk = Settings.canDrawOverlays(context) }
-
     val notifLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { }
 
+    fun enregistrer() {
+        store.heureDeclenchement = timeState.hour
+        store.minuteDeclenchement = timeState.minute
+        store.affichageAutoActif = auto
+        MaximeScheduler.programmer(context)
+    }
+
     Dialog(
         onDismissRequest = {
-            store.heureDeclenchement = timeState.hour
-            store.minuteDeclenchement = timeState.minute
-            store.affichageAutoActif = auto
+            enregistrer()
             onFermer()
         },
         properties = DialogProperties(usePlatformDefaultWidth = false)
@@ -323,41 +320,13 @@ private fun DialogReglages(store: MaximeStore, onFermer: () -> Unit) {
 
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    "Heure à partir de laquelle la maxime s'affiche au 1er déverrouillage :",
+                    "Heure à partir de laquelle la maxime du jour t'attend (tu la verras au déverrouillage) :",
                     color = Color(0xFF555555),
                     fontSize = 13.sp,
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(Modifier.height(12.dp))
                 TimePicker(state = timeState)
-
-                Spacer(Modifier.height(8.dp))
-
-                // Permissions nécessaires pour l'ouverture automatique
-                if (!overlayOk) {
-                    CarteAvertissement(
-                        texte = "Pour que la maxime s'ouvre toute seule, autorise « Afficher par-dessus les autres applis ».",
-                        boutonLabel = "Autoriser l'affichage",
-                        onClic = {
-                            val intent = Intent(
-                                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                                Uri.parse("package:${context.packageName}")
-                            )
-                            overlayLauncher.launch(intent)
-                        }
-                    )
-                    Spacer(Modifier.height(8.dp))
-                }
-
-                OutlinedButton(
-                    onClick = {
-                        val intent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
-                        runCatching { context.startActivity(intent) }
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("Désactiver l'optimisation batterie")
-                }
 
                 Spacer(Modifier.height(16.dp))
                 Button(
@@ -370,32 +339,13 @@ private fun DialogReglages(store: MaximeStore, onFermer: () -> Unit) {
                         ) {
                             notifLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                         }
-                        store.heureDeclenchement = timeState.hour
-                        store.minuteDeclenchement = timeState.minute
-                        store.affichageAutoActif = auto
-                        UnlockService.demarrer(context)
+                        enregistrer()
                         onFermer()
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text("Enregistrer")
                 }
-            }
-        }
-    }
-}
-
-@Composable
-private fun CarteAvertissement(texte: String, boutonLabel: String, onClic: () -> Unit) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF4E5))
-    ) {
-        Column(modifier = Modifier.padding(12.dp)) {
-            Text(texte, color = Color(0xFF7A4F01), fontSize = 13.sp)
-            Spacer(Modifier.height(8.dp))
-            Button(onClick = onClic, modifier = Modifier.fillMaxWidth()) {
-                Text(boutonLabel)
             }
         }
     }
