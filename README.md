@@ -32,6 +32,8 @@ L'application est volontairement **sobre en permissions** :
   du matin. L'app te la demande au premier enregistrement des réglages.
 - **Démarrage** (`RECEIVE_BOOT_COMPLETED`, accordée automatiquement) : pour
   reprogrammer l'alarme du matin après un redémarrage du téléphone.
+- **Alarme exacte** (`USE_EXACT_ALARM`, accordée automatiquement, sans pop-up) :
+  pour que la notification se déclenche pile à l'heure, même en veille.
 
 Pas de service permanent, pas d'« afficher par-dessus les autres applis », pas
 d'exemption de batterie. Si tu refuses les notifications, l'app marche toujours :
@@ -57,8 +59,11 @@ via `sdk.dir=/chemin/vers/android-sdk`).
 
 - Kotlin + Jetpack Compose, `minSdk 26`, `targetSdk 33`.
 - Données stockées en JSON dans les `SharedPreferences` (kotlinx.serialization).
-- `MaximeScheduler` : programme une **alarme inexacte** quotidienne via
-  `AlarmManager` (aucune permission spéciale), reprogrammée chaque jour.
+- `MaximeScheduler` : programme une **alarme exacte** quotidienne via
+  `AlarmManager.setExactAndAllowWhileIdle()` (permission `USE_EXACT_ALARM`,
+  auto-accordée), reprogrammée chaque jour. L'alarme exacte se déclenche **même
+  en veille (Doze)** : une alarme inexacte serait reportée jusqu'au réveil du
+  téléphone, ce qui retardait la notification jusqu'à l'ouverture de l'app.
 - `AlarmReceiver` : à l'heure dite, dépose la notification de la maxime du matin.
 - `BootReceiver` : reprogramme l'alarme après un redémarrage ou une mise à jour.
 - `DisplayActivity` : l'écran plein écran, blanc, qui montre la maxime (ouvert

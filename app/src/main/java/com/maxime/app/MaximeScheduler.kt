@@ -4,6 +4,7 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import com.maxime.app.data.MaximeStore
 import java.util.Calendar
 
@@ -32,8 +33,20 @@ object MaximeScheduler {
         }
 
         val prochain = prochainDeclenchement(store.heureDeclenchement, store.minuteDeclenchement)
-        // Alarme inexacte qui réveille l'appareil : 0 permission spéciale.
-        alarmManager.set(AlarmManager.RTC_WAKEUP, prochain, pi)
+
+        // On veut une alarme EXACTE qui se déclenche même quand le téléphone
+        // est en veille (mode Doze) ; sinon le système la reporte jusqu'à la
+        // prochaine sortie de veille (typiquement à l'ouverture de l'app),
+        // d'où le bug « la notif n'arrive qu'à l'ouverture ».
+        val peutExacte = Build.VERSION.SDK_INT < Build.VERSION_CODES.S ||
+            alarmManager.canScheduleExactAlarms()
+
+        if (peutExacte) {
+            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, prochain, pi)
+        } else {
+            // Repli si la permission d'alarme exacte n'est pas accordée.
+            alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, prochain, pi)
+        }
     }
 
     fun annuler(context: Context) {

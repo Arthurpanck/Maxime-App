@@ -3,6 +3,10 @@
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Alarme exacte qui se déclenche même en veille (Doze).
+         USE_EXACT_ALARM est auto-accordée (pas de demande à l'utilisateur). -->
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
 
     <application
         android:name=".MaximeApp"
