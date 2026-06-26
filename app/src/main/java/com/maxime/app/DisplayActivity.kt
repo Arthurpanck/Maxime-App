@@ -14,17 +14,21 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.maxime.app.data.MaximeStore
+import com.maxime.app.ui.Cream
+import com.maxime.app.ui.DarkBrown
 import com.maxime.app.ui.MaximeTheme
+import com.maxime.app.ui.Terracotta
 
 /**
- * Écran plein écran, fond blanc et texte noir, qui affiche une maxime au
- * réveil. Un simple appui n'importe où referme l'écran.
+ * Écran plein écran, fond crème et texte brun en serif italique, qui affiche
+ * une maxime au réveil. Un simple appui n'importe où referme l'écran.
  */
 class DisplayActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,9 +45,9 @@ class DisplayActivity : ComponentActivity() {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(Color.White)
+                        .background(Cream)
                         .clickable { finish() }
-                        .padding(32.dp),
+                        .padding(36.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Column(
@@ -51,21 +55,23 @@ class DisplayActivity : ComponentActivity() {
                         verticalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            text = texte,
-                            color = Color(0xFF111111),
-                            fontSize = 26.sp,
-                            lineHeight = 38.sp,
-                            fontWeight = FontWeight.Light,
+                            text = "« $texte »",
+                            color = DarkBrown,
+                            fontFamily = FontFamily.Serif,
+                            fontStyle = FontStyle.Italic,
+                            fontSize = 28.sp,
+                            lineHeight = 40.sp,
+                            fontWeight = FontWeight.Normal,
                             textAlign = TextAlign.Center
                         )
                         if (auteur.isNotBlank()) {
                             Text(
                                 text = "— $auteur",
-                                color = Color(0xFF777777),
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Normal,
+                                color = Terracotta,
+                                fontFamily = FontFamily.Serif,
+                                fontSize = 17.sp,
                                 textAlign = TextAlign.Center,
-                                modifier = Modifier.padding(top = 24.dp)
+                                modifier = Modifier.padding(top = 28.dp)
                             )
                         }
                     }

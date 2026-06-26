@@ -1,12 +1,9 @@
 package com.maxime.app
 
 import android.Manifest
-import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -14,6 +11,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -35,8 +33,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
@@ -44,6 +40,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -53,8 +50,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -62,7 +61,12 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.core.content.ContextCompat
 import com.maxime.app.data.Maxime
 import com.maxime.app.data.MaximeStore
+import com.maxime.app.ui.Cream
+import com.maxime.app.ui.CreamSoft
+import com.maxime.app.ui.DarkBrown
 import com.maxime.app.ui.MaximeTheme
+import com.maxime.app.ui.MutedBrown
+import com.maxime.app.ui.Terracotta
 
 class MainActivity : ComponentActivity() {
 
@@ -92,10 +96,23 @@ private fun EcranPrincipal(store: MaximeStore) {
     var ouvrirReglages by remember { mutableStateOf(false) }
 
     Scaffold(
-        containerColor = Color.White,
+        containerColor = Cream,
         topBar = {
             TopAppBar(
-                title = { Text("Maxime", fontWeight = FontWeight.SemiBold) },
+                title = {
+                    Text(
+                        "Mes maximes",
+                        fontFamily = FontFamily.Serif,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 24.sp,
+                        color = DarkBrown
+                    )
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Cream,
+                    titleContentColor = DarkBrown,
+                    actionIconContentColor = Terracotta
+                ),
                 actions = {
                     IconButton(onClick = { ouvrirReglages = true }) {
                         Icon(Icons.Filled.Settings, contentDescription = "Réglages")
@@ -106,8 +123,8 @@ private fun EcranPrincipal(store: MaximeStore) {
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { dialogEdition = EtatEdition() },
-                containerColor = Color(0xFF111111),
-                contentColor = Color.White
+                containerColor = Terracotta,
+                contentColor = androidx.compose.ui.graphics.Color.White
             ) {
                 Icon(Icons.Filled.Add, contentDescription = "Ajouter")
             }
@@ -123,8 +140,9 @@ private fun EcranPrincipal(store: MaximeStore) {
             ) {
                 Text(
                     "Aucune maxime pour l'instant.\nAppuie sur + pour en ajouter une.",
-                    color = Color(0xFF777777),
-                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                    color = MutedBrown,
+                    fontFamily = FontFamily.Serif,
+                    textAlign = TextAlign.Center
                 )
             }
         } else {
@@ -132,7 +150,7 @@ private fun EcranPrincipal(store: MaximeStore) {
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding),
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp),
+                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 96.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(maximes, key = { it.id }) { maxime ->
@@ -167,34 +185,37 @@ private fun EcranPrincipal(store: MaximeStore) {
 private fun LigneMaxime(maxime: Maxime, onModifier: () -> Unit, onSupprimer: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFF7F7F7)),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+        colors = CardDefaults.cardColors(containerColor = androidx.compose.ui.graphics.Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Row(
-            modifier = Modifier.padding(start = 16.dp, top = 12.dp, bottom = 12.dp, end = 4.dp),
+            modifier = Modifier.padding(start = 18.dp, top = 14.dp, bottom = 14.dp, end = 4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    maxime.texte,
-                    color = Color(0xFF111111),
-                    fontSize = 16.sp,
-                    lineHeight = 22.sp
+                    "« ${maxime.texte} »",
+                    color = DarkBrown,
+                    fontFamily = FontFamily.Serif,
+                    fontStyle = FontStyle.Italic,
+                    fontSize = 17.sp,
+                    lineHeight = 24.sp
                 )
                 if (maxime.auteur.isNotBlank()) {
                     Text(
                         "— ${maxime.auteur}",
-                        color = Color(0xFF888888),
+                        color = Terracotta,
+                        fontFamily = FontFamily.Serif,
                         fontSize = 13.sp,
-                        modifier = Modifier.padding(top = 4.dp)
+                        modifier = Modifier.padding(top = 6.dp)
                     )
                 }
             }
             IconButton(onClick = onModifier) {
-                Icon(Icons.Filled.Edit, contentDescription = "Modifier", tint = Color(0xFF555555))
+                Icon(Icons.Filled.Edit, contentDescription = "Modifier", tint = MutedBrown)
             }
             IconButton(onClick = onSupprimer) {
-                Icon(Icons.Filled.Delete, contentDescription = "Supprimer", tint = Color(0xFF555555))
+                Icon(Icons.Filled.Delete, contentDescription = "Supprimer", tint = MutedBrown)
             }
         }
     }
@@ -215,13 +236,14 @@ private fun DialogEdition(
     var auteur by remember { mutableStateOf(etat.auteur) }
 
     Dialog(onDismissRequest = onAnnuler) {
-        Card(colors = CardDefaults.cardColors(containerColor = Color.White)) {
+        Card(colors = CardDefaults.cardColors(containerColor = CreamSoft)) {
             Column(modifier = Modifier.padding(20.dp)) {
                 Text(
                     if (etat.id == null) "Nouvelle maxime" else "Modifier la maxime",
-                    fontSize = 18.sp,
+                    fontFamily = FontFamily.Serif,
+                    fontSize = 20.sp,
                     fontWeight = FontWeight.SemiBold,
-                    color = Color(0xFF111111)
+                    color = DarkBrown
                 )
                 Spacer(Modifier.height(16.dp))
                 OutlinedTextField(
@@ -290,7 +312,7 @@ private fun DialogReglages(store: MaximeStore, onFermer: () -> Unit) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White)
+            colors = CardDefaults.cardColors(containerColor = CreamSoft)
         ) {
             Column(
                 modifier = Modifier.padding(20.dp),
@@ -298,9 +320,10 @@ private fun DialogReglages(store: MaximeStore, onFermer: () -> Unit) {
             ) {
                 Text(
                     "Réglages",
-                    fontSize = 18.sp,
+                    fontFamily = FontFamily.Serif,
+                    fontSize = 20.sp,
                     fontWeight = FontWeight.SemiBold,
-                    color = Color(0xFF111111),
+                    color = DarkBrown,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 8.dp)
@@ -311,8 +334,8 @@ private fun DialogReglages(store: MaximeStore, onFermer: () -> Unit) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        "Affichage automatique le matin",
-                        color = Color(0xFF111111),
+                        "Maxime du matin",
+                        color = DarkBrown,
                         modifier = Modifier.weight(1f)
                     )
                     Switch(checked = auto, onCheckedChange = { auto = it })
@@ -321,7 +344,7 @@ private fun DialogReglages(store: MaximeStore, onFermer: () -> Unit) {
                 Spacer(Modifier.height(8.dp))
                 Text(
                     "Heure à partir de laquelle la maxime du jour t'attend (tu la verras au déverrouillage) :",
-                    color = Color(0xFF555555),
+                    color = MutedBrown,
                     fontSize = 13.sp,
                     modifier = Modifier.fillMaxWidth()
                 )

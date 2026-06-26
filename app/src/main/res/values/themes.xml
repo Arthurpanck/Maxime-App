@@ -2,14 +2,15 @@
 <resources>
 
     <style name="Theme.Maxime" parent="android:Theme.Material.Light.NoActionBar">
-        <item name="android:statusBarColor">@android:color/white</item>
-        <item name="android:navigationBarColor">@android:color/white</item>
+        <item name="android:statusBarColor">#F3EEE4</item>
+        <item name="android:navigationBarColor">#F3EEE4</item>
         <item name="android:windowLightStatusBar">true</item>
-        <item name="android:windowBackground">@android:color/white</item>
+        <item name="android:windowLightNavigationBar">true</item>
+        <item name="android:windowBackground">#F3EEE4</item>
     </style>
 
     <style name="Theme.Maxime.Display" parent="Theme.Maxime">
-        <item name="android:windowBackground">@android:color/white</item>
+        <item name="android:windowBackground">#F3EEE4</item>
     </style>
 
 </resources>
